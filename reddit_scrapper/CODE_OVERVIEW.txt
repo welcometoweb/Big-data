@@ -1,0 +1,447 @@
+# Web Scraping System - Complete Code Files
+
+This document contains all the code files for the Excel-based web scraping system.
+
+## File Index
+
+### Core Scraping Files
+1. **backfill_scraper.txt** - One-time profile scraper (~4600 posts)
+2. **daily_scraper.txt** - Daily homepage scraper (~3 posts)
+
+### Database & Configuration
+3. **excel_client.txt** - Excel database manager
+4. **config.txt** - Configuration management
+5. **requirements.txt** - Python dependencies
+
+### Utilities
+6. **selector_inspector.txt** - CSS selector discovery tool
+7. **test_setup.txt** - Setup verification script
+
+### Legacy (Not Used)
+8. **airtable_client.txt** - Old Airtable integration (replaced by excel_client.txt)
+
+---
+
+## System Overview
+
+### What This System Does
+- **Part 1**: Scrapes ~4600 historical posts from a public profile page (one-time backfill)
+- **Part 2**: Scrapes ~3 new posts daily from the homepage (automated)
+- **Storage**: All data saved to Excel file (posts_database.xlsx)
+- **Automation**: GitHub Actions for daily scheduled runs
+
+### Data Captured (4 Fields)
+1. **URL** - Direct link to the post
+2. **Text** - Post content/caption
+3. **Date** - Publication date/timestamp
+4. **Image Links** - URLs of all images
+
+---
+
+## Quick Setup Guide
+
+### 1. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+Required packages:
+- beautifulsoup4 - HTML parsing
+- requests - HTTP requests
+- python-dotenv - Environment variables
+- openpyxl - Excel file handling
+- pandas - Data manipulation
+- selenium - Web automation
+- webdriver-manager - Chrome driver management
+
+### 2. Configure Environment (.env file)
+```env
+EXCEL_FILE_PATH=posts_database.xlsx
+PROFILE_URL=https://yoursite.com/profile/username
+HOMEPAGE_URL=https://yoursite.com/
+RATE_LIMIT=2
+```
+
+### 3. Find CSS Selectors
+```bash
+python selector_inspector.py YOUR_PROFILE_URL
+```
+
+### 4. Update Selectors
+Edit both backfill_scraper.txt and daily_scraper.txt with working selectors.
+
+### 5. Run
+```bash
+# Test first
+python test_setup.py
+
+# Daily scraper (3 posts)
+python daily_scraper.py
+
+# Full backfill (~4600 posts)
+python backfill_scraper.py
+```
+
+---
+
+## File Details
+
+### 1. backfill_scraper.txt
+**Purpose**: One-time scraping of ~4600 posts from a profile page
+
+**Key Functions**:
+- `ProfileScraper.__init__()` - Initialize Selenium WebDriver
+- `scroll_to_load_posts()` - Scroll page to load all posts
+- `extract_post_data()` - Extract URL, text, date, images from post
+- `scrape_profile()` - Main scraping logic
+- `run_backfill()` - Execute full backfill with Excel upload
+
+**Usage**:
+```bash
+python backfill_scraper.py
+```
+
+**Customization Required**:
+- Update CSS selectors for target platform
+- Adjust scroll behavior if needed
+- Modify target post count (default: 4600)
+
+---
+
+### 2. daily_scraper.txt
+**Purpose**: Daily scraping of ~3 new posts from homepage
+
+**Key Functions**:
+- `DailyScraper.__init__()` - Initialize Selenium WebDriver
+- `extract_post_data()` - Extract post fields
+- `scrape_homepage()` - Scrape recent posts
+- `run_daily_scrape()` - Execute daily scrape with duplicate detection
+
+**Usage**:
+```bash
+python daily_scraper.py
+```
+
+**Customization Required**:
+- Update CSS selectors for target platform
+- Adjust target post count (default: 3)
+
+---
+
+### 3. excel_client.txt
+**Purpose**: Manage Excel database operations
+
+**Key Features**:
+- Auto-creates Excel file if not exists
+- Batch insert (multiple records at once)
+- Duplicate detection by URL
+- Export to CSV capability
+
+**Key Functions**:
+- `ExcelClient.__init__()` - Initialize client, create file if needed
+- `create_record()` - Add single post
+- `create_records_batch()` - Add multiple posts efficiently
+- `check_duplicate()` - Check if URL already exists
+- `get_all_urls()` - Get list of all existing URLs
+- `export_to_csv()` - Export data to CSV format
+
+**Usage Example**:
+```python
+from excel_client import ExcelClient
+
+client = ExcelClient()
+post = {
+    'url': 'https://example.com/post/123',
+    'text': 'Post content',
+    'date': '2024-01-01',
+    'image_links': 'https://example.com/img.jpg'
+}
+client.create_record(post)
+```
+
+---
+
+### 4. config.txt
+**Purpose**: Centralized configuration management
+
+**Configuration Values**:
+- `EXCEL_FILE_PATH` - Excel database path
+- `PROFILE_URL` - Profile page URL
+- `HOMEPAGE_URL` - Homepage URL
+- `RATE_LIMIT` - Requests per second (default: 2)
+- `USER_AGENT` - Browser user agent string
+- `COLUMN_NAMES` - Excel column headers
+
+**Functions**:
+- `validate_config()` - Validate configuration (always returns True for Excel)
+
+---
+
+### 5. requirements.txt
+**Purpose**: Python package dependencies
+
+**Packages**:
+```
+beautifulsoup4==4.12.3
+requests==2.31.0
+python-dotenv==1.0.1
+openpyxl==3.1.2
+pandas==2.2.0
+selenium==4.18.1
+webdriver-manager==4.0.1
+```
+
+---
+
+### 6. selector_inspector.txt
+**Purpose**: Discover CSS selectors for target platform
+
+**What It Does**:
+- Opens target page in browser
+- Tests common CSS selectors
+- Shows which selectors find elements
+- Displays sample data from found elements
+
+**Categories Tested**:
+- Posts (article, [data-testid='post'], etc.)
+- Links (a[href*='/status/'], time a, etc.)
+- Text ([data-testid='tweetText'], .post-content, etc.)
+- Date/Time (time, [datetime], .timestamp, etc.)
+- Images (img[src*='media'], .post-image img, etc.)
+
+**Usage**:
+```bash
+python selector_inspector.py https://yoursite.com/profile
+```
+
+**Output Example**:
+```
+📌 Posts:
+  ✓ 'article' → Found 20 elements
+  ✗ '.post-item' → Not found
+
+📌 Text:
+  ✓ '[data-testid="tweetText"]' → Found 20 elements
+    Sample: This is a post...
+```
+
+---
+
+### 7. test_setup.txt
+**Purpose**: Verify system setup and configuration
+
+**Tests**:
+1. Import test - Verify all modules can be imported
+2. Configuration test - Check .env settings
+3. Excel test - Create database, test write operations
+4. Create test record - Verify data insertion works
+
+**Usage**:
+```bash
+python test_setup.py
+```
+
+**Expected Output**:
+```
+✅ ALL IMPORTS SUCCESSFUL!
+✅ EXCEL DATABASE CONNECTION SUCCESSFUL!
+✅ All tests passed! System is ready.
+```
+
+---
+
+### 8. airtable_client.txt (LEGACY - NOT USED)
+**Note**: This file is from the old Airtable-based system. 
+**Current system uses**: excel_client.txt instead
+**Can be deleted**: Not needed for Excel-based system
+
+---
+
+## CSS Selector Customization Guide
+
+### Why Customize?
+The scrapers use generic selectors that work on many platforms, but each site is different. You MUST update selectors for your specific target.
+
+### Where to Update?
+Edit both `backfill_scraper.py` and `daily_scraper.py`:
+
+**1. Post Container** (around line 115 in backfill, line 85 in daily):
+```python
+# Change this:
+post_elements = self.driver.find_elements(By.CSS_SELECTOR, "article, [data-testid='post'], .post-item")
+
+# To your working selector:
+post_elements = self.driver.find_elements(By.CSS_SELECTOR, "article")
+```
+
+**2. In extract_post_data() method** (around line 49 in both):
+
+**URL**:
+```python
+link_element = post_element.find_element(By.CSS_SELECTOR, "YOUR_SELECTOR")
+```
+
+**Text**:
+```python
+text_element = post_element.find_element(By.CSS_SELECTOR, "YOUR_SELECTOR")
+```
+
+**Date**:
+```python
+date_element = post_element.find_element(By.CSS_SELECTOR, "YOUR_SELECTOR")
+```
+
+**Images**:
+```python
+image_elements = post_element.find_elements(By.CSS_SELECTOR, "YOUR_SELECTOR")
+```
+
+### How to Find Selectors?
+1. Run `python selector_inspector.py YOUR_URL`
+2. Note which selectors show ✓ (found elements)
+3. Update the scraper files with working selectors
+4. Test with `python daily_scraper.py` (only 3 posts)
+5. If successful, run full backfill
+
+---
+
+## GitHub Actions Automation
+
+The system includes a GitHub Actions workflow for daily automation:
+
+**File**: `.github/workflows/daily_scraper.yml`
+
+**What It Does**:
+- Runs daily at 9 AM UTC
+- Scrapes 3 new posts
+- Updates Excel file
+- Commits changes back to repo
+
+**Setup**:
+1. Push code to GitHub
+2. Add secrets (optional): PROFILE_URL, HOMEPAGE_URL
+3. Workflow runs automatically
+4. Excel file is committed after each run
+
+**Download Results**:
+- Pull latest changes: `git pull`
+- Or download from Actions artifacts
+
+---
+
+## Advantages of Excel-Based System
+
+✅ **No API Keys** - Works completely offline
+✅ **No Rate Limits** - No external API calls
+✅ **Free Forever** - No subscription costs
+✅ **Easy Viewing** - Open in Excel/Google Sheets
+✅ **Easy Editing** - Manual corrections if needed
+✅ **Portable** - Take data anywhere
+✅ **Simple Setup** - Just configure URLs and go
+✅ **Version Control** - Commit Excel file to Git
+
+---
+
+## Common Issues & Solutions
+
+### Issue: "No element found"
+**Solution**: Update CSS selectors using selector_inspector.py
+
+### Issue: "Permission denied" on Excel file
+**Solution**: Close Excel if file is open
+
+### Issue: No posts scraped
+**Solution**: 
+- Verify URLs in .env are correct
+- Run with headless=False to see browser
+- Check if site structure changed
+
+### Issue: Only finding duplicates
+**Solution**: This is normal - system prevents re-scraping
+
+### Issue: Excel file too large
+**Solution**: 
+- Export to CSV for analysis
+- Archive old data to separate file
+- Excel supports 1M+ rows but files get large
+
+---
+
+## Performance Notes
+
+### Backfill Scraper
+- **Time**: 30-60 minutes for 4600 posts
+- **Rate**: ~2 posts/second (adjustable)
+- **Scrolling**: Auto-scrolls until target count reached
+
+### Daily Scraper
+- **Time**: ~30 seconds
+- **Posts**: 3 new posts
+- **Efficiency**: Gets 5-8 posts, returns 3 unique ones
+
+### Excel Operations
+- **Batch Size**: 10 records at a time
+- **Read Speed**: Instant (even with 1000s of rows)
+- **Write Speed**: ~0.1 seconds per batch
+
+---
+
+## Export Options
+
+### Export to CSV
+```python
+from excel_client import ExcelClient
+client = ExcelClient()
+client.export_to_csv('my_export.csv')
+```
+
+### Open in Google Sheets
+1. Upload posts_database.xlsx to Google Drive
+2. Open with Google Sheets
+
+### Import to Database
+Use pandas to read Excel and insert into SQL:
+```python
+import pandas as pd
+df = pd.read_excel('posts_database.xlsx')
+# Then use df.to_sql() or similar
+```
+
+---
+
+## Legal & Ethical Notes
+
+⚠️ **Important Reminders**:
+- Only scrape **publicly available** data
+- Respect robots.txt and Terms of Service
+- Don't overload servers (use rate limiting)
+- Be aware of privacy regulations (GDPR, CCPA)
+- For educational/personal use only
+- Some platforms prohibit automated scraping
+
+---
+
+## Support & Documentation
+
+- **README.md** - Full documentation
+- **QUICKSTART.md** - Step-by-step setup guide
+- **This file** - Code reference and sharing
+
+---
+
+## File Sharing
+
+All .txt files can be:
+- ✅ Emailed
+- ✅ Uploaded to cloud storage
+- ✅ Shared in chat/messaging apps
+- ✅ Opened in any text editor
+- ✅ Viewed on any device
+
+No special software needed to view!
+
+---
+
+**Last Updated**: March 31, 2026
+**System Version**: Excel-based (v2.0)
+**Previous Version**: Airtable-based (v1.0) - deprecated
