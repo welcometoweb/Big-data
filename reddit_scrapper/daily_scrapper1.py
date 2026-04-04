@@ -29,12 +29,20 @@ class DailyScraper:
 
     def __init__(self, headless: bool = True):
         chrome_options = Options()
+
         if headless:
             chrome_options.add_argument("--headless=new")
-
+        
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
-        chrome_options.add_argument(f"user-agent={config.USER_AGENT}")
+        
+        # 🔥 ADD THESE (important)
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+        chrome_options.add_argument("--window-size=1920,1080")
+        
+        chrome_options.add_argument(
+            "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36"
+        )
 
         # ✅ IMPORTANT: Selenium auto-driver (NO Service / NO WebDriverManager)
         self.driver = webdriver.Chrome(options=chrome_options)
@@ -99,12 +107,28 @@ class DailyScraper:
             raise ValueError("Homepage URL not provided")
 
         logger.info(f"Starting homepage scrape: {url}")
+        # Step 1: Open reddit base first (needed for cookies)
+        self.driver.get("https://www.reddit.com")
+        
+        # Step 2: Set cookie to force old reddit
+        self.driver.add_cookie({
+            'name': 'over18',
+            'value': '1',
+            'domain': '.reddit.com'
+        })
+        
+        # Step 3: Now open target
         self.driver.get(url)
+        
+        # 🔍 DEBUG (VERY IMPORTANT)
+        print("FINAL URL:", self.driver.current_url)
 
         # Wait for Reddit posts
-        WebDriverWait(self.driver, 15).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "article"))
-        )
+        time.sleep(5)
+        print(self.driver.page_source[:2000])
+        # WebDriverWait(self.driver, 15).until(
+            #EC.presence_of_element_located((By.CSS_SELECTOR, "article"))
+        #)
 
         # Small scroll to trigger lazy loading
         self.driver.execute_script("window.scrollTo(0, 800);")
