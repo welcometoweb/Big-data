@@ -13,6 +13,10 @@ on:
 permissions:
   contents: write
 
+defaults:
+  run:
+    working-directory: reddit_scrapper
+
 jobs:
   scraper:
     runs-on: ubuntu-latest
