@@ -2,7 +2,7 @@ name: Reddit Scraper Pipeline
 
 on:
   schedule:
-    - cron: "30 15 * * *"   # 21:00 IST
+    - cron: "30 15 * * *"
   workflow_dispatch:
 
 permissions:
@@ -18,58 +18,30 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      # 📥 Checkout repo
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      # 🐍 Setup Python
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
-      # 📦 Install dependencies
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # 🌐 Setup Chrome
       - name: Setup Chrome
         uses: browser-actions/setup-chrome@v1
 
-      # 🔍 DEBUG STEP (SAFE VERSION)
+      # 🔍 DEBUG STEP (SAFE & YAML-COMPATIBLE)
       - name: Dump page source
         run: |
-          echo "Creating debug script..."
-          
-          cat > debug.py << 'EOF'
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+          python -c "from selenium import webdriver; from selenium.webdriver.chrome.options import Options; o=Options(); o.add_argument('--headless=new'); o.add_argument('--no-sandbox'); o.add_argument('--disable-dev-shm-usage'); d=webdriver.Chrome(options=o); d.get('https://www.reddit.com/r/worldnews/'); print('TITLE:', d.title); print(d.page_source[:1000]); d.quit()"
 
-options = Options()
-options.add_argument("--headless=new")
-options.add_argument("--no-sandbox")
-options.add_argument("--disable-dev-shm-usage")
-
-driver = webdriver.Chrome(options=options)
-driver.get("https://www.reddit.com/r/worldnews/")
-
-print("TITLE:", driver.title)
-print("PAGE SOURCE (first 1000 chars):")
-print(driver.page_source[:1000])
-
-driver.quit()
-EOF
-
-          echo "Running debug script..."
-          python debug.py
-
-      # ▶️ Run scraper
       - name: Run scraper
         run: python daily_scrapper1.py
 
-      # 💾 Commit Excel output
       - name: Commit and push
         run: |
           git config --global user.name "github-actions"
