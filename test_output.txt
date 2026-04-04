@@ -1,3 +1,72 @@
-Script ran at: 2026-04-02 15:46:11.980590
-Script ran at: 2026-04-02 16:15:33.218662
-Script ran at: 2026-04-03 15:57:01.077268
+Run python daily_scrapper1.py
+
+INFO:excel_client:Using existing Excel database: posts_database.xlsx
+
+INFO:__main__:Fetching existing URLs from Excel
+
+INFO:__main__:Found 88 existing records
+
+INFO:__main__:Starting homepage scrape: https://old.reddit.com/r/worldnews/
+
+Traceback (most recent call last):
+
+  File "/home/runner/work/Big-data/Big-data/reddit_scrapper/daily_scrapper1.py", line 167, in <module>
+
+    main()
+
+  File "/home/runner/work/Big-data/Big-data/reddit_scrapper/daily_scrapper1.py", line 163, in main
+
+    scraper.run_daily_scrape(target_posts=3)
+
+  File "/home/runner/work/Big-data/Big-data/reddit_scrapper/daily_scrapper1.py", line 142, in run_daily_scrape
+
+    posts = self.scrape_homepage(max_posts=target_posts + 5)
+
+  File "/home/runner/work/Big-data/Big-data/reddit_scrapper/daily_scrapper1.py", line 105, in scrape_homepage
+
+    WebDriverWait(self.driver, 15).until(
+
+  File "/opt/hostedtoolcache/Python/3.10.20/x64/lib/python3.10/site-packages/selenium/webdriver/support/wait.py", line 105, in until
+
+    raise TimeoutException(message, screen, stacktrace)
+
+selenium.common.exceptions.TimeoutException: Message: 
+
+Stacktrace:
+
+#0 0x55a1b3cada6a <unknown>
+
+#1 0x55a1b36bcab5 <unknown>
+
+#2 0x55a1b370f676 <unknown>
+
+#3 0x55a1b370f8b1 <unknown>
+
+#4 0x55a1b375a614 <unknown>
+
+#5 0x55a1b37577b6 <unknown>
+
+#6 0x55a1b3702cbf <unknown>
+
+#7 0x55a1b3703a81 <unknown>
+
+#8 0x55a1b3c73a64 <unknown>
+
+#9 0x55a1b3c76951 <unknown>
+
+#10 0x55a1b3c6021e <unknown>
+
+#11 0x55a1b3c7751e <unknown>
+
+#12 0x55a1b3c46be0 <unknown>
+
+#13 0x55a1b3c9a9b8 <unknown>
+
+#14 0x55a1b3c9ab88 <unknown>
+
+#15 0x55a1b3cac4de <unknown>
+
+#16 0x7fb54bc9caa4 <unknown>
+
+#17 0x7fb54bd29c6c <unknown>
+
