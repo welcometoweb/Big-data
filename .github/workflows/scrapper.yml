@@ -2,7 +2,7 @@ name: Reddit Scraper Pipeline
 
 on:
   schedule:
-    - cron: "30 15 * * *"   # 21:00 IST
+    - cron: "30 15 * * *"
   workflow_dispatch:
 
 permissions:
@@ -44,26 +44,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y xvfb
 
-      # 🔍 Optional debug (safe, uses display)
-      - name: Debug Chrome launch
-        run: |
-          xvfb-run --auto-servernum python -c "
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-
-o = Options()
-o.add_argument('--no-sandbox')
-o.add_argument('--disable-dev-shm-usage')
-
-driver = webdriver.Chrome(options=o)
-driver.get('https://www.reddit.com/r/worldnews/')
-
-print('TITLE:', driver.title)
-print(driver.page_source[:500])
-
-driver.quit()
-"
-
       # ▶️ Run scraper (non-headless Chrome via Xvfb)
       - name: Run scraper
         run: |
@@ -78,11 +58,8 @@ driver.quit()
           echo "Files in directory:"
           ls -l
 
-          # Add Excel file safely
           git add *.xlsx || echo "No Excel file to add"
+          git commit -m "Scraper update - $(date)" || echo "No changes"
 
-          git commit -m "Scraper update - $(date)" || echo "No changes to commit"
-
-          # Sync and push
           git pull --rebase origin main
           git push
