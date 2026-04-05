@@ -49,6 +49,9 @@ jobs:
         run: |
           xvfb-run --auto-servernum python daily_scrapper1.py
 
+      - name: Debug
+        run: xvfb-run python debug.py
+
       # 💾 Commit Excel output (FIXED)
       - name: Commit and push changes
         run: |
