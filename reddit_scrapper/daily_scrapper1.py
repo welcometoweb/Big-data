@@ -46,6 +46,7 @@ class DailyScraper:
 
         # ✅ IMPORTANT: Selenium auto-driver (NO Service / NO WebDriverManager)
         self.driver = webdriver.Chrome(options=chrome_options)
+        self.driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
         self.excel = ExcelClient()
 
     # -------------------------------------------------------------
@@ -119,6 +120,8 @@ class DailyScraper:
         
         # Step 3: Now open target
         self.driver.get(url)
+        import random
+        time.sleep(random.uniform(3, 6))
         
         # 🔍 DEBUG (VERY IMPORTANT)
         print("FINAL URL:", self.driver.current_url)
@@ -183,7 +186,7 @@ class DailyScraper:
 # Entry point
 # ------------------------------------------------------------------
 def main():
-    scraper = DailyScraper(headless=True)
+    scraper = DailyScraper(headless=False)   # 🔥 changed
     scraper.run_daily_scrape(target_posts=3)
 
 
