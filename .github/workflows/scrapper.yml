@@ -2,7 +2,7 @@ name: Reddit Scraper Pipeline
 
 on:
   schedule:
-    - cron: "30 15 * * *"
+    - cron: "30 15 * * *"   # 21:00 IST
   workflow_dispatch:
 
 permissions:
@@ -18,39 +18,59 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - name: Checkout repo
+      # 📥 Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
+      # 🐍 Setup Python
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
+      # 📦 Install dependencies
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      # 🌐 Install Chrome
       - name: Setup Chrome
         uses: browser-actions/setup-chrome@v1
 
-      # 🔥 Run with virtual display (VERY IMPORTANT)
-      - name: Install xvfb
+      # 🖥️ Install virtual display (REAL FIX)
+      - name: Install Xvfb
         run: |
           sudo apt-get update
           sudo apt-get install -y xvfb
 
-      # 🔍 Debug (keep for now)
-      - name: Dump page source
+      # 🔍 Optional debug (safe, uses display)
+      - name: Debug Chrome launch
         run: |
-          python -c "from selenium import webdriver; from selenium.webdriver.chrome.options import Options; o=Options(); o.add_argument('--no-sandbox'); o.add_argument('--disable-dev-shm-usage'); d=webdriver.Chrome(options=o); d.get('https://www.reddit.com/r/worldnews/'); print('TITLE:', d.title); print(d.page_source[:1000]); d.quit()"
+          xvfb-run --auto-servernum python -c "
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 
-      # ▶️ Run scraper (non-headless via xvfb)
+o = Options()
+o.add_argument('--no-sandbox')
+o.add_argument('--disable-dev-shm-usage')
+
+driver = webdriver.Chrome(options=o)
+driver.get('https://www.reddit.com/r/worldnews/')
+
+print('TITLE:', driver.title)
+print(driver.page_source[:500])
+
+driver.quit()
+"
+
+      # ▶️ Run scraper (non-headless Chrome via Xvfb)
       - name: Run scraper
-        run: xvfb-run python daily_scrapper1.py
+        run: |
+          xvfb-run --auto-servernum python daily_scrapper1.py
 
-      # 💾 Commit safely (FIXED)
-      - name: Commit and push
+      # 💾 Commit Excel output (FIXED)
+      - name: Commit and push changes
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
@@ -58,8 +78,11 @@ jobs:
           echo "Files in directory:"
           ls -l
 
-          git add *.xlsx || echo "No excel file"
-          git commit -m "Scraper update - $(date)" || echo "No changes"
+          # Add Excel file safely
+          git add *.xlsx || echo "No Excel file to add"
 
+          git commit -m "Scraper update - $(date)" || echo "No changes to commit"
+
+          # Sync and push
           git pull --rebase origin main
           git push
