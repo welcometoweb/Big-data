@@ -11,7 +11,7 @@ permissions:
 
 env:
   AWS_REGION: ap-south-1
-  LAMBDA_NAME: lambda_function
+  LAMBDA_NAME: event-trigger-lambda
 
 jobs:
   deploy:
