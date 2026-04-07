@@ -8,5 +8,5 @@ def lambda_handler(event, context):
 
     return {
         "statusCode": 200,
-        "body": json.dumps("Lambda is working 🚀")
+        "body": json.dumps("Lambda is working through CICD")
     }
