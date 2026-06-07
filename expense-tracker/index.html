@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pocket Ledger</title>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="card">
+
+            <h1>💸 Pocket Ledger</h1>
+
+            <p id="greeting"></p>
+
+            <div class="field">
+                <label>👤 Person</label>
+                <select id="person">
+                    <option>Himanshu</option>
+                    <option>Shreyali</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>🍔 Category</label>
+                <select id="category">
+                    <option>Food</option>
+                    <option>Travel</option>
+                    <option>Shopping</option>
+                    <option>Bills</option>
+                    <option>Entertainment</option>
+                    <option>Health</option>
+                    <option>Other</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>💳 Payment</label>
+                <select id="paymentMode">
+                    <option>UPI</option>
+                    <option>Cash</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>💰 Amount</label>
+                <input type="number" id="amount" placeholder="Enter amount">
+            </div>
+
+            <div class="field">
+                <label>📝 Notes</label>
+                <textarea id="notes" placeholder="Optional"></textarea>
+            </div>
+
+            <div class="field">
+                <label>🎯 Type</label>
+
+                <div class="type-buttons">
+                    <button class="type-btn active" data-type="Need">Need</button>
+                    <button class="type-btn" data-type="Want">Want</button>
+                    <button class="type-btn" data-type="Save">Save</button>
+                </div>
+            </div>
+
+            <button class="save-btn" onclick="saveExpense()">
+                + Log Expense
+            </button>
+
+            <p id="status"></p>
+
+            <div class="last-expense">
+                <small id="lastExpense"></small>
+            </div>
+
+            <div class="links">
+                <a href="#">📊 Weekly</a>
+                <a href="#">📈 Monthly</a>
+            </div>
+
+        </div>
+
+        <footer>
+            Powered by poor financial decisions™
+        </footer>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
